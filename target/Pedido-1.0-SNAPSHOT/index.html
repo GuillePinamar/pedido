@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido de Farmacia</title>
+    <link rel="stylesheet" href="CSS/Style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+</head>
+<body>
+        <nav class="navbar bg-success">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                </a>
+            </div>
+        </nav>
+    
+    <main>
+        <section>
+            <div class="card text-bg-ligth">
+                <img src="Media/Temp/stock.jpg" class="img-fluid" alt="...">
+                    <div class="card-img-overlay d-flex justify-content-center align-items-center tituloPedido">
+                            <p class="card-text">Pedido de Farmacia</p>
+                    </div>
+            </div>
+            <div>
+            </div>
+        </section>
+        <br>
+        <section class="container d-flex justify-content-md-center">
+            <form id="dataForm">
+            <div class="row col-md">
+                <div class="col mb-3">
+                    <label class="form-label">Sector</label>
+                    <input type="text" class="form-control" list="sector" placeholder="Seleccione sector" required>
+                    <datalist id="sector">
+                        <option value="Guardia"></option>
+                        <option value="Internacion"></option>
+                        <option value="Uti"></option>
+                        <option value="Maternidad"></option>
+                    </datalist>
+                </div>
+                <div class="col mb-3">
+                    <label class="form-label">Fecha</label>
+                    <input type="date" class="form-control" id="fecha" required>
+                </div>
+            </div>
+            <div class="row col-md">
+                   <div class="col mb-3">
+                    <label class="form-label">Material Descartable</label>
+                    <input class="form-control" list="pediList" id="lista" placeholder="Material" required>
+                    <datalist id="pediList">
+                        
+                    </datalist>
+                </div> 
+                <div class="col mb-3">
+                    <label class="form-label">Cantidad</label>
+                    <input class="form-control" type="number" id="cantidad" name="cantidad" placeholder="Cantidad" required>
+                </div>
+            </div>               
+            <div class="row col-md">
+                <div class="col d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                </div>
+            </div>
+           </form>
+        </section>
+        <section class="container-fluid d-flex justify-content-md-center mt-3">
+            <div class="row col text-center">
+                <h1>MEDICACION / MATERIAL DESCARTABLE</h1>
+            </div>
+        </section>
+        <section class="container">
+            <div class="container mt-4 shadow-lg p3 mb-5 bg-body rounded text-center">
+                <table class="table table-bordered table-striped bg-body" id="datosTabla">
+                    <thead>
+                        <tr>
+                            <th>RP</th>
+                            <th>DESCRIPCION</th>
+                            <th>CANTIDAD</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md d-flex justify-content-end align-items-center">
+                    <button onclick="generarPDF()" class="btn btn-primary">Guardar PDF</button> 
+                </div>
+            </div>
+        </section> 
+    </main>
+    
+        <nav class="navbar bg-success">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                </a>
+            </div>
+        </nav>
+   
+    <script src="JS/getRequests.js"></script>
+    <script src="JS/postRequests.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function generarPDF(){
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const sect = document.querySelector('option').value;
+            const fec = document.querySelector('#fecha').value;
+            
+            html2canvas(document.querySelector("#datosTabla")).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 190;
+            const pageHeight = 190;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+
+            let position = 30;
+            
+            doc.text(`Sector: ${sect}`, 10, 10);
+            doc.text(`Fecha: ${fec}`, 10, 20);
+
+            doc.addImage(imgData, 'PNG', 10,  position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', 10,  position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                }
+                doc.save('Pedido.pdf');
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+</body>
+</html>
